@@ -1,12 +1,16 @@
 use std::u32;
+use std::convert::TryInto;
 
 pub fn is_armstrong_number(num: u32) -> bool {
 
-    let digits = get_number_of_digits(num);
-    let iter = num.to_string();
-    let iter2 = iter.chars().map(|d| d.to_digit(10).unwrap());
-    // why is this still at iterator of characters?
-    let sum:u32 = iter2.map(|n|n.pow(digits)).sum();
+    // let digits = get_number_of_digits(num);
+
+    // let sum:u32 = num.to_string().chars().map(|d| d.to_digit(10).unwrap()).map(|n|n.pow(digits)).sum();;
+    let string = num.to_string();
+    let sum:u32 = string.chars().map(|d| d.to_digit(10).unwrap()).map(|n|n.pow((string.len()).try_into().unwrap())).sum();
+    // let iter2 = iter.chars().map(|d| d.to_digit(10).unwrap());
+    // // why is this still at iterator of characters?
+    // let sum:u32 = iter2.map(|n|n.pow(digits)).sum();
     // print!("{}", sum);
     return sum == num
 
