@@ -2,7 +2,10 @@ use std::u32;
 
 pub fn is_armstrong_number(num: u32) -> bool {
     let digits = get_number_of_digits(num);
-    (0..digits).fold((num,0), |acc,_| ((acc.0)/10,acc.1 + ((acc.0 % 10) as u32).pow(digits))).1 == num
+    match (0..digits).try_fold((num,0), |(current_num,sum),_| short_circuit_armstrong(sum + ((current_num % 10) as u32).pow(digits), num, current_num/10)) {
+        None => false,
+        Some((_, sum)) => sum == num
+    }
 }
 
 pub fn get_number_of_digits(num: u32) -> u32 {
@@ -10,3 +13,7 @@ pub fn get_number_of_digits(num: u32) -> u32 {
     (num_f.log10()+1.0) as u32
 }
 
+pub fn short_circuit_armstrong(sum: u32, num: u32, pass:u32) -> Option<(u32,u32)>{
+    if sum > num { return None }
+    Some((pass, sum))
+}
