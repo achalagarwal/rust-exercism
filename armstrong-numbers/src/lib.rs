@@ -8,11 +8,13 @@ pub fn is_armstrong_number(num: u32) -> bool {
     }
 }
 
+#[inline]
 pub fn get_number_of_digits(num: u32) -> u32 {
     let num_f = num as f32;
     (num_f.log10()+1.0) as u32
 }
 
+#[inline]
 pub fn short_circuit_armstrong(sum: u32, num: u32, pass:u32) -> Option<(u32,u32)>{
     if sum > num { return None }
     Some((pass, sum))
