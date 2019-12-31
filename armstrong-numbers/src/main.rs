@@ -1,9 +1,11 @@
 mod lib;
+use std::iter;
 // use get_number_of_digits;
 
 fn main(){
 
-    let v = (0..10000000).map(|x| lib::is_armstrong_number(x)).filter(|x| *x ==  true).count();
+    // let v = (0..10000000).map(|x| lib::is_armstrong_number(x)).filter(|x| *x ==  true).count();
+    let v = iter::repeat(999999999).take(10000000).map(|x| lib::is_armstrong_number(x)).filter(|x| *x ==  true).count();
     print!("{}", v);
     let d = lib::get_number_of_digits(10000);
     assert_eq!(d, 5);
