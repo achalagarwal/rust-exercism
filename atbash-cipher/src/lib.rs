@@ -5,25 +5,29 @@ use itertools::Itertools;
 /// "Encipher" with the Atbash cipher.
 pub fn encode(plain: &str) -> String {
 
-    let string = plain.chars()
-    .filter_map(|x| extract_valid_char(x))
+    plain.chars()
+    .filter_map(extract_valid_char)
     .chunks(5)
     .into_iter()
-    .flat_map(|x| x.chain(iter::once(' ')))
-    // .map(|(i, x)| 
-    //     if i%5 == 0 && i>0 {let mut s = String::from(" "); s.push(x); s} 
-    //     else{x.to_string()})
-    .collect::<String>();
-
-    string[0..string.len()-1].to_string()
+    .flat_map(|x| iter::once(' ').chain(x))
+    .skip(1)
+    .collect::<String>()
 
 }
 
+pub fn encode1(plaintext: &str) -> String {
+    plaintext.chars()
+        .filter_map(extract_valid_char).collect::<Vec<_>>()
+        .chunks(5).collect::<Vec<_>>()
+        .join(&' ').iter().cloned().collect()
+}
+
+
 /// "Decipher" with the Atbash cipher.
 pub fn decode(cipher: &str) -> String {
-
+    
     cipher.chars()
-    .filter_map(|x| extract_valid_char(x))
+    .filter_map(extract_valid_char)
     .collect::<String>()   
 
 }
