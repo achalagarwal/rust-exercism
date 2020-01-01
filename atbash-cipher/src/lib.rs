@@ -1,16 +1,21 @@
 use std::char;
+use std::iter;
+use itertools::Itertools;
 
 /// "Encipher" with the Atbash cipher.
 pub fn encode(plain: &str) -> String {
 
-    plain.chars()
-    .filter(|x| x.is_ascii_alphanumeric())
-    .map(|x| apply_cipher_alphanumeric(x))
-    .enumerate()
-    .map(|(i, x)| 
-        if i%5 == 0 && i>0 {let mut s = String::from(" "); s.push(x); s} 
-        else{x.to_string()})
-    .collect::<String>()
+    let string = plain.chars()
+    .filter_map(|x| extract_valid_char(x))
+    .chunks(5)
+    .into_iter()
+    .flat_map(|x| x.chain(iter::once(' ')))
+    // .map(|(i, x)| 
+    //     if i%5 == 0 && i>0 {let mut s = String::from(" "); s.push(x); s} 
+    //     else{x.to_string()})
+    .collect::<String>();
+
+    string[0..string.len()-1].to_string()
 
 }
 
@@ -18,18 +23,24 @@ pub fn encode(plain: &str) -> String {
 pub fn decode(cipher: &str) -> String {
 
     cipher.chars()
-    .filter(|x| x.is_ascii_alphanumeric())
-    .map(|x| apply_cipher_alphanumeric(x))
+    .filter_map(|x| extract_valid_char(x))
     .collect::<String>()   
 
 }
 
-fn apply_cipher_alphanumeric(c: char) -> char {
+fn extract_valid_char(c: char) -> Option<char> {
+    if c.is_ascii_alphanumeric(){
+        return apply_cipher_alphanumeric(c)
+    }
+    return None
+}
+
+fn apply_cipher_alphanumeric(c: char) -> Option<char> {
     // assert_eq!(c.is_ascii_alphanumeric(), true);
 
     if c.is_ascii_alphabetic(){
-        return char::from_u32(219 - c.to_ascii_lowercase() as u32).unwrap()
+        return char::from_u32(219 - c.to_ascii_lowercase() as u32)
     }
     // else
-    c
+    Some(c)
 }
