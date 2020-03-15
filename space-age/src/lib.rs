@@ -2,6 +2,9 @@
 // In order to pass the tests you can add-to or change any of this code.
 
 
+// derive a struct duration which will help extract meaningful information
+// from what is usually given
+
 #[derive(Debug)]
 pub struct Duration
 {
@@ -10,6 +13,11 @@ pub struct Duration
 }
 
 impl From<u64> for Duration {
+
+    // in this case, we know that we will get input in raw seconds
+    // but those seconds need to be converted into earth years
+    // as the required output is in years
+
     fn from(s: u64) -> Self {
         // return
          Duration{
@@ -23,6 +31,10 @@ impl From<u64> for Duration {
 
 pub trait Planet {
     const ORBITAL_PERIOD: f64;
+
+    // the default implementation which works for the 8 planets
+    // if we had a Special_Planet whose years_during was not as simple
+    // that would be implemented in the respective `impl Planet for Special_Planet`
     fn years_during(d: &Duration) -> f64 {
 
         d.float/Self::ORBITAL_PERIOD
@@ -59,6 +71,12 @@ pub struct Uranus{
 pub struct Neptune{
     // orbital_period: op_neptune
 }
+
+// TODO
+// hardcode the orbital periods in the respective structs as that should
+// be accessible when someone works with the struct
+
+// then Planet's const orbital_period should use that value
 
 impl Planet for Mercury {
     const ORBITAL_PERIOD: f64 = 0.2408467;
