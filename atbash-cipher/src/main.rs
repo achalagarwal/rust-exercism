@@ -16,11 +16,11 @@ pub fn main(){
     let strings: Vec<String> = (30..10000).map(|x| get_rand_string(x)).collect();
     let mut iter = strings.iter();
     let mut now = Instant::now();
-    iter.map(|x| lib::encode1(&x.to_string())).fold(0, |acc, x| 1+acc);
+    iter.map(|x| lib::encode(&x.to_string())).fold(0, |acc, x| 1+acc);
     println!("{}\n", now.elapsed().as_millis());
     iter = strings.iter();
     now = Instant::now();
-    iter.map(|x| lib::encode(&x.to_string())).fold(0, |acc, x| 1+acc);
+    iter.map(|x| lib::encode1(&x.to_string())).fold(0, |acc, x| 1+acc);
     println!("{}", now.elapsed().as_millis());
     return;
     print!("{}\n", '»' as u32);

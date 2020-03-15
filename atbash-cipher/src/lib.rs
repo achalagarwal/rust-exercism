@@ -7,9 +7,10 @@ pub fn encode(plain: &str) -> String {
 
     plain.chars()
     .filter_map(extract_valid_char)
+    .collect::<Vec<_>>()
     .chunks(5)
     .into_iter()
-    .flat_map(|x| iter::once(' ').chain(x))
+    .flat_map(|x| iter::once(&' ').chain(x))
     .skip(1)
     .collect::<String>()
 
