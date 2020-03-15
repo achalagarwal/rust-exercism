@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use itertools::FoldWhile::{Continue, Done};
 use itertools::Itertools;
+const CHARACTER_SET_SIZE: usize = 65536;
 
 pub fn anagrams_for<'a>(word: &str, possible_anagrams: &'a[&str]) -> HashSet<&'a str> {
 
@@ -10,13 +11,14 @@ pub fn anagrams_for<'a>(word: &str, possible_anagrams: &'a[&str]) -> HashSet<&'a
 
     // set the storage block
 
-    let mut arr: [i32; 26] = [0; 26]; 
+    let mut arr: [i32; CHARACTER_SET_SIZE] = [0; CHARACTER_SET_SIZE]; 
 
     // compute the letter count
 
     let non_zero_entries = word.chars().
-    filter(|c| c.is_alphabetic()).
+    // filter(|c| c.is_alphabetic()).
     map(|c| (c as char).to_lowercase()).
+    // map(|c| (c as char).to_lowercase().
     flat_map(|x| x).
     // filter(|c| c.is_ascii_lowercase()).
     map(|c| c as u32 - 97_u32).
@@ -25,14 +27,14 @@ pub fn anagrams_for<'a>(word: &str, possible_anagrams: &'a[&str]) -> HashSet<&'a
     let mut hashset: HashSet<&'a str> = HashSet::new();
  
     possible_anagrams.iter().
-    filter(|x| x.to_ascii_lowercase()!=word.to_ascii_lowercase()).
+    filter(|x| x.to_lowercase()!=word.to_lowercase()).
     filter(|x| reduces_to_zero(x, arr, non_zero_entries)).
     fold(true ,|_, x| hashset.insert(x));
 
     return hashset;
 }
 
-fn reduces_to_zero(word: &str,arr:[i32; 26], non_zero_entries: u32  ) -> bool {
+fn reduces_to_zero(word: &str,arr:[i32; CHARACTER_SET_SIZE], non_zero_entries: u32  ) -> bool {
     let mut cloned_arr = arr.clone();
 
     word.chars().
