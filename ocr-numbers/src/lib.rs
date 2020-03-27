@@ -24,6 +24,7 @@ pub enum RowPattern{
     SUS,
     SSS,
     ERR,
+    ERRCOL(usize)
     // Undefined
 }
 
@@ -57,10 +58,17 @@ pub fn convert(input: &str) -> Result<String, Error> {
 
     let a = input.split('\n');
     let b = a.map(|iter| convert_row_to_patterns(iter.chars().collect()));
-    let c = b.collect::<Vec<_>>();
-    let d = itertools::multizip((&c[0],&c[1],&c[2],&c[3]));
-    let e = d.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)| getCharacterFromRowPatterns(&[*f,*s,*t]).unwrap());
-    Ok(e.collect::<String>())
+    let c_i = b.collect::<Vec<_>>();
+    if c_i.len()%4 != 0 {
+        return Err(Error::InvalidRowCount(c_i.len()))
+    }
+    // let d = c_i.chunks(4).map(|c|  itertools::multizip((&c[0],&c[1],&c[2],&c[3]))).collect::<Vec<_>>();
+    let d = itertools::multizip((&c_i[0],&c_i[1],&c_i[2],&c_i[3]));
+    let e = d.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)| match getCharacterFromRowPatterns(&[*f,*s,*t]) {
+        Ok(ch) => Ok(ch),
+        Err(e) => Err(e)
+    });
+    e.collect::<Result<String, Error>>()
     
     // let cols : Vec<Iterator<Item=RowPattern>> = input.split('\n').map(|iter| convert_row_to_patterns(iter.chars().collect())).collect()::Vec<_>;
     // itertools::multizip(cols).map(|(f,s,t,b):(RowPattern,RowPattern,RowPattern,RowPattern)| getCharacterFromRowPatterns(&[f,s,t])).collect()
@@ -80,7 +88,7 @@ pub fn convert(input: &str) -> Result<String, Error> {
 
 pub fn convert_row_to_patterns(input: Vec<char>) -> Vec<RowPattern> {
 
-    input.chunks_exact(3).map(|arr| getRowPattern(arr.to_vec())).collect()
+    input.chunks(3).map(|arr| getRowPattern(arr.to_vec())).collect()
 
 }
 
@@ -97,16 +105,24 @@ pub fn getRowPattern(triplet: Vec<char>) -> RowPattern {
             [' ','_','|'] => RowPattern::SUP,
             [' ','_',' '] => RowPattern::SUS,
             [' ',' ',' '] => RowPattern::SSS,
-            [_,_,_] => RowPattern::SSS,
-            _ => RowPattern::SSS,
-            [_,_] => RowPattern::SSS,
-            [_] => RowPattern::SSS,
-            [] => RowPattern::SSS
+            // [_,_,_] => RowPattern::SSS,
+            _ => RowPattern::ERR,
+           
         }
     
     }
     else {
-        RowPattern::ERR
+
+        match triplet.as_slice(){
+
+            [_,_] => RowPattern::ERRCOL(5),
+            [_] => RowPattern::ERRCOL(4),
+            [] => RowPattern::ERR,
+            [_, _, _, ..] => RowPattern::ERR
+            // [] => RowPattern::SSS
+            // RowPattern::ERR
+        
+        }
     }
   
 }
@@ -124,7 +140,15 @@ pub fn getCharacterFromRowPatterns(triplet: &[RowPattern; 3]) -> Result<char, Er
         [RowPattern::SUS,RowPattern::PUP,RowPattern::PUP] => Ok('8'),
         [RowPattern::SUS,RowPattern::PUP,RowPattern::SUP] => Ok('9'),
         [RowPattern::SUS,RowPattern::PSP,RowPattern::PUP] => Ok('0'),
-        [RowPattern::ERR, _, _] => Err(Error::InvalidColumnCount(1)),
+        [RowPattern::ERRCOL(4), _, _] => Err(Error::InvalidColumnCount(4)),
+        [RowPattern::ERRCOL(5), _, _] => Err(Error::InvalidColumnCount(4)),
+        [_, RowPattern::ERRCOL(4), _] => Err(Error::InvalidColumnCount(4)),
+        [_, RowPattern::ERRCOL(5), _] => Err(Error::InvalidColumnCount(4)),
+        // [RowPattern::ERRCOL(4), ..] => Err(Error::InvalidColumnCount(4)),
+        // [RowPattern::ERRCOL(5), ..] => Err(Error::InvalidColumnCount(4)),
+        [.., RowPattern::ERRCOL(5),] => Err(Error::InvalidColumnCount(4)),
+        [.., RowPattern::ERRCOL(4),] => Err(Error::InvalidColumnCount(4)),
+        // [RowPattern::ERR, _, _] => Err(Error::InvalidColumnCount(1)),
         _ => Ok('?')
         // None => expr,
     }
