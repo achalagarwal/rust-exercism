@@ -62,26 +62,34 @@ pub fn convert(input: &str) -> Result<String, Error> {
     if c_i.len()%4 != 0 {
         return Err(Error::InvalidRowCount(c_i.len()))
     }
-    let mut r = String::with_capacity(100);
-
-    let d: Result<Vec<_>, _> = c_i.chunks(4).map(|c|  fromParaToString(&[c[0], c[1], c[2], c[3]])).map();
-    // acc.push(fromParaToString(x)); acc})
-    Ok(r)
-    // collect::<Vec<_>>();
-    // let d = itertools::multizip((&c_i[0],&c_i[1],&c_i[2],&c_i[3]));
-    // let f = fromZipToString()
-
-}
-pub fn fromParaToString(quadruplet: &[Vec<RowPattern>; 4]) -> Result<String, Error> {
-
-    let d = itertools::multizip((&quadruplet[0],&quadruplet[1],&quadruplet[2],&quadruplet[3]));
-
-    let e = d.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)| match getCharacterFromRowPatterns(&[*f,*s,*t]) {
+    let de = c_i.chunks(4).map(|c|  itertools::multizip((&c[0],&c[1],&c[2],&c[3])));
+    
+    // let ef = de.map(|x| x.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)|match getCharacterFromRowPatterns(&[*f,*s,*t]) {
+    //     Ok(ch) => Ok(ch),
+    //     Err(e) => Err(e)
+    // }));
+    // use fold into a String with , in the end of each iterator element
+    de.fold(Ok(String::new()), |s, x| match x.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)|match getCharacterFromRowPatterns(&[*f,*s,*t]) {
         Ok(ch) => Ok(ch),
         Err(e) => Err(e)
-    });
-    e.collect::<Result<String, Error>>()
+    }).collect::<Result<String, Error>>(){ 
+        Ok(string) => match s { 
+                                Ok(mut s) => {if s.is_empty() {Ok(string)} else {s.push(','); s.push_str(&string); Ok(s)}} // append s with , and string 
+                                Err(e) => Err(e),
+                              },
+        Err(err) => Err(err),
+    })
 
+
+    
+
+    // d = itertools::multizip((&c_i[0],&c_i[1],&c_i[2],&c_i[3]));
+    // let e = d.map(|(f,s,t,_):(&RowPattern,&RowPattern,&RowPattern,&RowPattern)| match getCharacterFromRowPatterns(&[*f,*s,*t]) {
+    //     Ok(ch) => Ok(ch),
+    //     Err(e) => Err(e)
+    // });
+    // e.collect::<Result<String, Error>>()
+    
     // let cols : Vec<Iterator<Item=RowPattern>> = input.split('\n').map(|iter| convert_row_to_patterns(iter.chars().collect())).collect()::Vec<_>;
     // itertools::multizip(cols).map(|(f,s,t,b):(RowPattern,RowPattern,RowPattern,RowPattern)| getCharacterFromRowPatterns(&[f,s,t])).collect()
     
