@@ -19,7 +19,7 @@ pub fn sublist<T: PartialEq>(_first_list: &[T], _second_list: &[T]) -> Compariso
             return Comparison::Superlist
         }
         else{
-            return Comparison::Sublist;
+            return Comparison::Unequal;
         }
     }
 
