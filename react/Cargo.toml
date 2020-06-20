@@ -2,3 +2,9 @@
 edition = "2018"
 name = "react"
 version = "2.0.0"
+
+[dependencies]
+indexmap = "1.4.0"
+uuid = "0.8"
+nanoid = "0.3"
+rand = "0.7.3"
