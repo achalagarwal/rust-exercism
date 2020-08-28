@@ -46,7 +46,8 @@ impl<T: Copy + PartialEq> Reactor<T> {
 
     // Creates an input cell with the specified initial value, returning its ID.
     pub fn create_input(&mut self, _initial: T) -> InputCellID {
-        unimplemented!()
+        InputCellID()
+        // unimplemented!()
     }
 
     // Creates a compute cell with the specified dependencies and compute function.
